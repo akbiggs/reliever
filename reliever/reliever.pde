@@ -1,6 +1,8 @@
-Diamond[] diamond = new Diamond[50];
+Diamond[] diamonds = new Diamond[2000];
+int nextDiamondIndex = 0;
 int timer = 0;
 int interval = 0;
+
 void setup() {
   size(900, 300);
   resetTimer();
@@ -11,7 +13,7 @@ void draw() {
   updateDiamondTimer();
   adjustInterval();
   if (shouldSpawnDiamond()) {
-    spawnDiamond();
+    pushDiamond();
     resetTimer();
   }
   updateAndDrawDiamonds();
@@ -29,8 +31,20 @@ boolean shouldSpawnDiamond() {
   return timer >= interval;
 }
 
-void spawnDiamond() {
-  
+void pushDiamond() {
+  Point origin = new Point(width/2, height/2);
+  diamonds[nextDiamondIndex++] = new Diamond(origin, 5, 4, 6);
+}
+
+void updateAndDrawDiamonds() {
+  for (int i=0; i < nextDiamondIndex; i++) {
+    Diamond diamond = diamonds[i];
+    diamond.update();
+    diamond.render();
+  }
+}
+void resetTimer() {
+  timer = 0;
 }
 
 class Point {
@@ -53,7 +67,7 @@ class Diamond {
   }
   
   void update() {
-    this.lineSize = mouseY;
+    this.lineSize += 5;
   }
   
   void render() {
@@ -67,12 +81,13 @@ class Diamond {
   }
   
   void renderSides() {
-    line(-lineSize/2, -lineSize/2, lineSize/2, -lineSize/2);
+    line(-lineSize/2, -lineSize/2, lineSize/2, -lineSize/2); // top (upper left)
     line(lineSize/2 + lineOffset, -lineSize/2 + lineOffset,
-      lineSize/2 + lineOffset, lineSize/2 + lineOffset);
-    line(lineSize/2, lineSize/2 + 2*lineOffset, -lineSize/2, lineSize/2 + 2*lineOffset);
+      lineSize/2 + lineOffset, lineSize/2 + lineOffset); // right (upper right)
+    line(lineSize/2, lineSize/2 + 2*lineOffset, 
+      -lineSize/2, lineSize/2 + 2*lineOffset); // bottom (bottom right)
     line(-lineSize/2 - lineOffset, lineSize/2 + lineOffset, -lineSize/2 - lineOffset,
-      -lineSize/2 + lineOffset);
+      -lineSize/2 + lineOffset); // left (bottom left)
   }
   
   private void setupStyle() {
