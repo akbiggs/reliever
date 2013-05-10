@@ -4,7 +4,7 @@ int timer = 0;
 int interval = 0;
 
 void setup() {
-  size(displayWidth, displayHeight, P3D);
+  size(displayWidth, displayHeight, P3D);  
   //size(900, 300, P3D);
   resetTimer();
 }
