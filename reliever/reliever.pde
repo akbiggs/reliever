@@ -4,8 +4,7 @@ int timer = 0;
 int interval = 0;
 
 void setup() {
-  size(displayWidth, displayHeight, P3D);  
-  //size(900, 300, P3D);
+  size(900, 300, P3D);
   resetTimer();
 }
 
@@ -74,9 +73,15 @@ class Diamond {
   }
   
   void update() {
-    this.lineWeight = 2;
+    moveTowardsViewer();
+    spinAround();
+  }
+  
+  void moveTowardsViewer() {
     origin.zpos += 5;
-    
+  }
+  
+  void spinAround() {
     rotation += rotationDelta;
   }
   
@@ -91,13 +96,29 @@ class Diamond {
   }
   
   void renderSides() {
-    line(-lineSize/2, -lineSize/2, lineSize/2, -lineSize/2); // top (upper left)
+    renderTopLeft();
+    renderTopRight();
+    renderBottomLeft();
+    renderBottomRight();
+  }
+  
+  void renderTopLeft() {
+    line(-lineSize/2, -lineSize/2, lineSize/2, -lineSize/2);
+  }
+  
+  void renderTopRight() {
     line(lineSize/2 + lineOffset, -lineSize/2 + lineOffset,
-      lineSize/2 + lineOffset, lineSize/2 + lineOffset); // right (upper right)
-    line(lineSize/2, lineSize/2 + 2*lineOffset, 
-      -lineSize/2, lineSize/2 + 2*lineOffset); // bottom (bottom right)
+      lineSize/2 + lineOffset, lineSize/2 + lineOffset);
+  }
+  
+  void renderBottomLeft() {
     line(-lineSize/2 - lineOffset, lineSize/2 + lineOffset, 
-      -lineSize/2 - lineOffset, -lineSize/2 + lineOffset); // left (bottom left)
+      -lineSize/2 - lineOffset, -lineSize/2 + lineOffset);
+  }
+  
+  void renderBottomRight() {
+    line(lineSize/2, lineSize/2 + 2*lineOffset, 
+      -lineSize/2, lineSize/2 + 2*lineOffset);
   }
   
   private void setupStyle() {
@@ -106,22 +127,22 @@ class Diamond {
     strokeWeight((float)this.lineWeight);
   }
   
+  private void cleanStyle() {
+    popStyle();
+  }
+  
+  private void moveToOrigin() {
+    translate(origin.xpos, origin.ypos, origin.zpos);
+  }
+  
   private void setupPosition() {
     pushMatrix();
     moveToOrigin();
     rotate(PI/4 + rotation);
   }
   
-  private void cleanStyle() {
-    popStyle();
-  }
-  
   private void cleanPosition() {
     popMatrix();
-  }
-  
-  private void moveToOrigin() {
-    translate(origin.xpos, origin.ypos, origin.zpos);
   }
 }
 
