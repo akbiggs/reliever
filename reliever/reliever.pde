@@ -24,7 +24,7 @@ void updateDiamondTimer() {
 }
 
 void adjustInterval() {
-  interval = max(10, mouseY);
+  interval = max(5, mouseY);
 }
 
 boolean shouldSpawnDiamond() {
@@ -32,12 +32,12 @@ boolean shouldSpawnDiamond() {
 }
 
 void pushDiamond() {
-  Point origin = new Point(width/2, height/2, -1000);
-  diamonds[nextDiamondIndex++] = new Diamond(origin, 100, 4, 6);
+  Point origin = new Point(width/2-200, height/2-200, -1000);
+  diamonds[nextDiamondIndex++] = new Diamond(origin, 100, 2, 6);
 }
 
 void updateAndDrawDiamonds() {
-  for (int i=0; i < nextDiamondIndex; i++) {
+  for (int i = 0; i < nextDiamondIndex; i++) {
     Diamond diamond = diamonds[i];
     diamond.update();
     diamond.render();
@@ -57,32 +57,46 @@ class Point {
 }
 
 class Diamond {
-  Point origin;
-  int lineSize, lineWeight, lineOffset;
+  Point origin, startPos;
+  int lineSize, lineWeight, lineOffset, lifetime;
   float rotation;
   float rotationDelta, depthDelta;
   
-  Diamond (Point origin, int lineSize, int lineWeight, int lineOffset) {
-    this.origin = origin;
+  Diamond (Point origin, int lineSize, int lineWeight, 
+    int lineOffset) {
+    this.startPos = new Point(origin.xpos, origin.ypos, origin.zpos);
+    this.origin = new Point(origin.xpos, origin.ypos, origin.zpos);
+    this.origin.xpos = pushTowards(origin.xpos, width/2, 4);
+    this.origin.ypos = pushTowards(origin.ypos, height/2, 4);
+    
     this.lineSize = lineSize;
     this.lineWeight = lineWeight;
     this.lineOffset = lineOffset;
     
+    this.lifetime = 0;
+    
     this.rotation = 0;
-    this.rotationDelta = PI/32;
+    this.rotationDelta = PI/128;
   }
   
   void update() {
     moveTowardsViewer();
     spinAround();
+    updateLifetime();
   }
   
   void moveTowardsViewer() {
-    origin.zpos += 5;
+    origin.zpos += 5*(lifetime/100);
+    origin.ypos = smoothStep(startPos.ypos, height/2, origin.ypos);
+    origin.xpos = smoothStep(startPos.xpos, width/2, origin.xpos);
   }
   
   void spinAround() {
     rotation += rotationDelta;
+  }
+  
+  void updateLifetime() {
+    lifetime++;
   }
   
   void render() {
@@ -146,3 +160,19 @@ class Diamond {
   }
 }
 
+float pushTowards(float value, float target, float speed) {
+  if (value < target) {
+    return min(value+speed, target);
+  } else {
+    return max(value-speed, target);
+  }
+}
+
+float smoothStep(float start, float end, float current) {
+  println("Start: " + str(start));
+  println("Current: " + str(current));
+  // see smoothstep wiki article for documentation
+  float t = (current-start)/(end-start);
+  println("t: " + str(t));
+  return lerp(start, end, t*t*(3 - 2*t));
+}
